@@ -3,6 +3,10 @@
  */
 
 var fs = require('fs');
+var {
+    stdout,
+    stdin
+} = process;
 
 // 这里的 点. === process.cwd();
 // var files = fs.readdirSync('.');
@@ -29,15 +33,33 @@ fs.readdir(__dirname, (err, files) => {
                 console.log('是文件'+ i + ': ' + filename)
             }
 
-            i++
-            if (i == files.length) {
+            if (++i == files.length) {
                 console.log('i等于文件个数')
-                process.stdout.write('请选择：')
-                process.stdin.resume();
+                // 把读取函数抽出来
+                read();
             }else {
                 file(i);
             }
         })
     }
+
+    function read() {
+        stdout.write('请输入有效的文件名称：');
+        stdin.resume();
+        stdin.setEncoding('utf8');
+        // 监听输入的内容
+        stdin.on('data', option);
+    }
+
+    function option(data) {
+        console.log(data, 'data是什么？')
+        // 如果输入的无效
+        if(!files[Number(data)]) {
+            stdout.write('请输入有效的文件名称：');
+        } else  {
+            stdin.pause();
+        }
+    }
+
     file(0)
 });
